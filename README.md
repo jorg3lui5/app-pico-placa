@@ -1,11 +1,11 @@
-# WebPicoPlaca
+# APIPicoPlaca
 
 Para que este aplicativo se ejecute correctamente, se necesita tener instalado lo siguiente:
 
 - Java 11.0.15
 - Maven 3.8.5
 
-# Ejecutar aplicacion web
+# Ejecutar API
 
 1. Compilar y generar package. Ejecutar comandos dentro de la carpeta del proyecto
 - mvn clean package
