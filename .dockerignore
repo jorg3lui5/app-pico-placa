@@ -1,0 +1,46 @@
+#Ignore the logs directory
+logs/
+
+#Ignoring git and cache folders
+.git
+.cache
+
+#Ignoring all the markdown and class files
+*.md
+**/*.class
+
+.dockerignore
+.DS_Store
+.git
+.github
+.gitignore
+.gitmodules
+.idea
+.jekyll-metadata
+.sass-cache
+tests
+_site
+CONTRIBUTING.md
+Dockerfile
+Dockerfile.archive
+docker-compose.yml
+_website*.json
+
+*/temp*
+*/*/temp*
+docker
+.vagrant
+.data
+.idea
+app/sessions/*
+app/logs/*
+app/cache/*
+app/gen-src/*
+app/conf/config.yml
+app/*.zip
+app/*.sql
+app/*.tar.gz
+*.zip
+*.sql
+*.log
+*.tar.gz
