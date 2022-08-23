@@ -1,4 +1,4 @@
-package corona.financiero.nmda.admision.service;
+package pico.placa.test.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,5 +40,23 @@ class AutoServiceTest {
 
     @Mock
     private Validaciones validaciones;
+    
+    @Test
+    void registrarTest() {
+    	var request = new AutoRequestDTO();
+
+        request.setColor("Rojo");
+        request.setChasis("11111");
+        request.setPlaca("ABC1234");
+        request.setModelo("Modelo1");
+        request.setOtraInformacion("Viejo");
+        doNothing().when(validaciones).validarPlaca(request.getPlaca());
+
+
+        when(autoRepository.findByPlacaAndVigenciaIsTrue(request.getPlaca())).thenReturn(Optional.empty());
+        
+        autoService.registrar(request);
+
+    }
 
 }

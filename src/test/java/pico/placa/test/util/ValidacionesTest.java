@@ -1,4 +1,4 @@
-package corona.financiero.nmda.admision.util;
+package pico.placa.test.util;
 
 
 import org.junit.jupiter.api.extension.ExtendWith;

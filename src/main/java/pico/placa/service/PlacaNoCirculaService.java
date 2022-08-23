@@ -38,10 +38,15 @@ public class PlacaNoCirculaService {
     private AutoService autoService;
 
 
+    /*
+     * Verifica si un auto con una placa específica puede o no circular en la fecha y hora recibida como parámetro
+     */
     public VerificaCirculacionResponseDTO verificarCirculacion(VerificaCirculacionRequestDTO request) {
     	
+    	//valida los datos del request
     	validarDatosCirculacionRequest(request);
         
+    	//verifica si el auto se encuentra registrado en la base de datos. Si no está registrado dará un error.
     	Optional<AutoEntity> autoEntityOptional = autoRepository.findByPlacaAndVigenciaIsTrue(request.getPlaca());
         if (!autoEntityOptional.isPresent()) {
             throw new BadRequestException("El auto con placa " + request.getPlaca() + " no se encuentra registrado");
@@ -49,20 +54,25 @@ public class PlacaNoCirculaService {
         
         AutoEntity autoEntity = autoEntityOptional.get();
         
+        //obtiene el ultimo digito de la placa
         int ultimoDigitoPlaca = Integer.valueOf(request.getPlaca().substring(request.getPlaca().length()-1));
         
         Calendar fechaHoraIngresada = Calendar.getInstance();
         fechaHoraIngresada.setTime(request.getFechaHora());
     	
+        //obtiene el dia de la semana según la fecha y hora recibida como parámetro
     	int diaSemana = recuperarDiaSemana(fechaHoraIngresada);
     	
+    	//recupera los horarios en los cuales no puede circular el autoi en el caso de que coincida el último digito de la placa y el día extraido de la fecha recibida como parámetro. 
         List<HorarioNoCirculaEntity> lstHorarioNoCirculaEntity= horarioNoCirculaRepository.recuperarHorariosPorUltimoDigitoPlacaAndDia(ultimoDigitoPlaca, diaSemana);
 
-        autoService.convertirAutoEntityToAutoResponseDTO(autoEntity);
+        //si el vehículo no tiene restricciones vehiculares en el dia de la semana indicado, entonces puede circular
         if (lstHorarioNoCirculaEntity.isEmpty()) {
         	return generarRespuestaCirculacionVehicular(autoEntity, true, "El vehículo es libre de circular");
         }
    	
+        //en el caso de que tenga restricciones de circulacion en el dia de la semana indicado, entonces filtra los horarios de restriccion que coincidan con la hora recibida como parámetro.
+        //si la lista es vacía (no tiene restricciones en la hora recibida como parámetro), entonces es libre de circular, caso contrario no puede circular.
     	lstHorarioNoCirculaEntity= lstHorarioNoCirculaEntity.stream().filter(horarioNoCirculaEntity-> {
     		return esHoraRestringida(fechaHoraIngresada, horarioNoCirculaEntity);
     	}).collect(Collectors.toList());
@@ -98,6 +108,7 @@ public class PlacaNoCirculaService {
     	return calendar.get(calendar.DAY_OF_WEEK)==1?7:calendar.get(calendar.DAY_OF_WEEK)-1;
     }
     
+    //verifica si la hora recibida como parámetro coincide con un horario restringido.
     private boolean esHoraRestringida(Calendar fechaHoraIngresada, HorarioNoCirculaEntity horarioNoCirculaEntity) {
     	LocalTime horaIngresada = LocalTime.ofInstant(fechaHoraIngresada.toInstant(), fechaHoraIngresada.getTimeZone().toZoneId());
 

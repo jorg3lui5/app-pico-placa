@@ -24,15 +24,22 @@ public class AutoService {
 
     private static final String USUARIO_TEMPORAL = "USR_TMP";
 
+    /*
+     * Registra un nuevo auto.
+     * request: AutoRequestDTO - datos del auto a registrar
+     */
     public String registrar(AutoRequestDTO request) {
 
+    	//valida que los datos del auto sean válidos
         validarDatosAuto(request);
 
+        //verifica si el auto ya está registrado
         Optional<AutoEntity> byId = autoRepository.findByPlacaAndVigenciaIsTrue(request.getPlaca());
         if (byId.isPresent()) {
             throw new BadRequestException("Ya se encuentra registrado un auto con la placa  " + request.getPlaca());
         }
 
+        //construye el auto segun la entidad para guardarlo
         AutoEntity autoEntity = convertirAutoRequestDTOToAutoEntity(request);
         autoRepository.save(autoEntity);
         
@@ -40,7 +47,7 @@ public class AutoService {
     }
     
     
-
+    //valida que los datos del auto sean válidos
     private void validarDatosAuto(AutoRequestDTO request) {
         if (request == null) {
             throw new BadRequestException();
@@ -66,6 +73,7 @@ public class AutoService {
 
     }
     
+    //transforma el bojeto request del auto a un objeto entity, el cual se guardará en la base de datos
     public AutoEntity convertirAutoRequestDTOToAutoEntity(AutoRequestDTO request) {
     	AutoEntity autoEntity = new AutoEntity();
     	autoEntity.setPlaca(request.getPlaca());
@@ -81,6 +89,7 @@ public class AutoService {
     	return autoEntity;
     }
     
+    //convierte una entidad auto a un response
     public AutoResponseDTO convertirAutoEntityToAutoResponseDTO(AutoEntity entity) {
     	AutoResponseDTO autoResponse = new AutoResponseDTO();
     	autoResponse.setId(entity.getId());
